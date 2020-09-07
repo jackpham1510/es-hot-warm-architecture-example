@@ -1,0 +1,18 @@
+---
+cluster.name: "hot-warm-cluster"
+node.name: "hot-node-2"
+
+node.master: false
+node.data: true
+node.ingest: false
+cluster.remote.connect: false
+
+# Tag
+node.attr.box_type: "hot"
+
+network.host: hot-node-2
+http.port: 9202
+transport.port: 9302
+
+cluster.initial_master_nodes: ["master-node"]
+discovery.seed_hosts: ["master-node:9300", "hot-node-1:9301", "hot-node-2:9302", "warm-node-1:9303", "warm-node-2:9304"]

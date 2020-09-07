@@ -1,0 +1,82 @@
+version: '3.5'
+
+services:
+  master-node:
+    build:
+      context: master-node/
+    restart: always
+    volumes:
+      - ./master-node/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./master-node/data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m -Des.transport.cname_in_publish_address=true"
+    networks:
+      - es-hot-warm-cluster
+
+  hot-node-1:
+    build:
+      context: hot-node-1/
+    restart: always
+    volumes:
+      - ./hot-node-1/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./hot-node-1/data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m -Des.transport.cname_in_publish_address=true"
+    networks:
+      - es-hot-warm-cluster
+
+  hot-node-2:
+    build:
+      context: hot-node-2/
+    restart: always
+    volumes:
+      - ./hot-node-2/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./hot-node-2/data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m -Des.transport.cname_in_publish_address=true"
+    networks:
+      - es-hot-warm-cluster
+
+  warm-node-1:
+    build:
+      context: warm-node-1/
+    restart: always
+    volumes:
+      - ./warm-node-1/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./warm-node-1/data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m -Des.transport.cname_in_publish_address=true"
+    networks:
+      - es-hot-warm-cluster
+  
+  warm-node-2:
+    build:
+      context: warm-node-2/
+    restart: always
+    volumes:
+      - ./warm-node-2/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./warm-node-2/data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m -Des.transport.cname_in_publish_address=true"
+    networks:
+      - es-hot-warm-cluster
+  
+  kibana:
+    build:
+      context: kibana/
+    restart: always
+    volumes:
+      - ./kibana/config/:/usr/share/kibana/config:ro
+    ports:
+      - "5701:5601"
+    networks:
+      - es-hot-warm-cluster
+    depends_on:
+      - master-node
+
+networks:
+  es-hot-warm-cluster:
+    external: true
